@@ -443,18 +443,19 @@ namespace DX11_Base
                 if (!pLocalPlayer)
                     return;
 
-                std::vector<SDK::AActor*> actors;
-
-                if (!config::GetAllActorsofType(SDK::APalCapturedCage::StaticClass(), &actors, true))
-                    return;
+		SDK::UWorld* world = Config.GetUWorld();
+                SDK::TUObjectArray* objects = world->GObjects;
 
                 auto draw = ImGui::GetBackgroundDrawList();
 
-                for (auto actor : actors)
+                for (int i = 0; i < objects->NumElements; ++i)//(auto actor : actors)
                 {
-                    SDK::APalCapturedCage* cage = static_cast<SDK::APalCapturedCage*>(actor); // Try to cast actor to APalCapturedCage
-                    if (!cage)
-                        continue; // Skip to the next actor if casting fails
+                    SDK::UObject* object = objects->GetByIndex(i);
+                    if (!object) continue;//skip empty object
+                    if (!object->IsA(SDK::APalCapturedCage::StaticClass())) continue;//skip if not a cage
+
+                    SDK::APalCapturedCage* cage = static_cast<SDK::APalCapturedCage*>(object);
+                    if (!cage) continue; // Skip if casting fails
 
                     SDK::FVector actorLocation = cage->K2_GetActorLocation();
                     SDK::FVector localPlayerLocation = pLocalPlayer->K2_GetActorLocation();
